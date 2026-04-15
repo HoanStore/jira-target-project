@@ -1,5 +1,7 @@
 package io.spring.controller;
 
+// @generated-by jira-dev-pipeline
+// @generated-ticket SCRUM-13
 import io.spring.service.GeneratedResourceService;
 import io.spring.dto.GeneratedResourceRequest;
 import io.spring.dto.GeneratedResourceResponse;

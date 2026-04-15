@@ -6,8 +6,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.spring.mapper.GeneratedResourceMapper">
 
-<select id="ping" parameterType="io.spring.dto.GeneratedResourceRequest" resultType="io.spring.dto.GeneratedResourceResponse">
-    /* TODO: implement query for ping */
+<select id="getSamplePing" parameterType="io.spring.dto.GeneratedResourceRequest" resultType="io.spring.dto.GeneratedResourceResponse">
+    /* TODO: implement query for GET /sample/ping */
     SELECT #{ticketId} AS ticketId
 </select>
 

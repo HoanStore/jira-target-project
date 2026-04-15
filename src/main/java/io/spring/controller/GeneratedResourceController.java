@@ -6,7 +6,11 @@ import io.spring.service.GeneratedResourceService;
 import io.spring.dto.GeneratedResourceRequest;
 import io.spring.dto.GeneratedResourceResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,9 +25,9 @@ public class GeneratedResourceController {
         this.generatedResourceService = generatedResourceService;
     }
 
-@PostMapping("/ping")
-    public ResponseEntity<GeneratedResourceResponse> ping(@RequestBody GeneratedResourceRequest request) {
+@GetMapping("/sample/ping")
+    public ResponseEntity<GeneratedResourceResponse> getSamplePing(@RequestBody GeneratedResourceRequest request) {
         // Generated from Jira ticket SCRUM-13
-        return ResponseEntity.ok(generatedResourceService.ping(request));
+        return ResponseEntity.ok(generatedResourceService.getSamplePing(request));
     }
 }

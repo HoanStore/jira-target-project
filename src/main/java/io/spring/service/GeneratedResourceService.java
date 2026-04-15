@@ -7,5 +7,5 @@ import io.spring.dto.GeneratedResourceResponse;
 
 public interface GeneratedResourceService {
 
-GeneratedResourceResponse ping(GeneratedResourceRequest request);
+GeneratedResourceResponse getSamplePing(GeneratedResourceRequest request);
 }

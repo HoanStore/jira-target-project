@@ -18,7 +18,7 @@ public class GeneratedResourceServiceImpl implements GeneratedResourceService {
     }
 
 @Override
-    public GeneratedResourceResponse ping(GeneratedResourceRequest request) {
-        return generatedResourceMapper.ping(request);
+    public GeneratedResourceResponse getSamplePing(GeneratedResourceRequest request) {
+        return generatedResourceMapper.getSamplePing(request);
     }
 }

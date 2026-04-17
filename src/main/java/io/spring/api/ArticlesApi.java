@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
 @RestController
 @RequestMapping(path = "/articles")
 @AllArgsConstructor
@@ -57,4 +63,28 @@ public class ArticlesApi {
         articleQueryService.findRecentArticles(
             tag, author, favoritedBy, new Page(offset, limit), user));
   }
+
+  // jira-dev-pipeline:block:start existing-api-ArticlesApi
+// @generated-by jira-dev-pipeline
+  // @generated-ticket SCRUM-14
+
+  @GetMapping(path = "/export/excel")
+  public ResponseEntity<byte[]> exportArticlesExcel(
+      @RequestParam(value = "tag", required = false) String tag,
+      @RequestParam(value = "favorited", required = false) String favoritedBy,
+      @RequestParam(value = "author", required = false) String author,
+      @AuthenticationPrincipal User user) {
+    byte[] workbook = articleQueryService.exportArticlesExcel(tag, author, favoritedBy, user);
+    String fileName =
+        "articles-"
+            + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+            + ".xlsx";
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+        .body(workbook);
+  }
+  // jira-dev-pipeline:block:end existing-api-ArticlesApi
 }

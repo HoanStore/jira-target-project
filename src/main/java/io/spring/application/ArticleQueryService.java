@@ -20,6 +20,13 @@ import lombok.AllArgsConstructor;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import org.springframework.web.util.HtmlUtils;
+
 @Service
 @AllArgsConstructor
 public class ArticleQueryService {
@@ -181,4 +188,179 @@ public class ArticleQueryService {
             userRelationshipQueryService.isUserFollowing(
                 user.getId(), articleData.getProfileData().getId()));
   }
+
+  // jira-dev-pipeline:block:start existing-service-ArticleQueryService
+// @generated-by jira-dev-pipeline
+  // @generated-ticket SCRUM-14
+
+  public byte[] exportArticlesExcel(String tag, String author, String favoritedBy, User user) {
+    List<ArticleData> exportArticles = new ArrayList<>();
+    int offset = 0;
+    while (true) {
+      ArticleDataList articleDataList =
+          findRecentArticles(tag, author, favoritedBy, new Page(offset, 100), user);
+      List<ArticleData> pageArticles =
+          articleDataList == null || articleDataList.getArticleDatas() == null
+              ? List.of()
+              : articleDataList.getArticleDatas();
+      exportArticles.addAll(pageArticles);
+      if (pageArticles.size() < 100) {
+        break;
+      }
+      offset += 100;
+    }
+    List<List<String>> rows = new ArrayList<>();
+    for (ArticleData articleData : exportArticles) {
+      rows.add(
+          List.of(
+              generatedNullToEmpty(articleData.getSlug()),
+              generatedNullToEmpty(articleData.getTitle()),
+              generatedNullToEmpty(articleData.getDescription()),
+              articleData.getProfileData() == null
+                  ? ""
+                  : generatedNullToEmpty(articleData.getProfileData().getUsername()),
+              articleData.getCreatedAt() == null ? "" : articleData.getCreatedAt().toString()));
+    }
+    return buildGeneratedWorkbook(
+        "articles",
+        List.of("slug", "title", "description", "author", "createdAt"),
+        rows);
+  }
+
+
+  private byte[] buildGeneratedWorkbook(
+      String sheetName, List<String> headers, List<List<String>> rows) {
+    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zipOutputStream =
+            new ZipOutputStream(outputStream, StandardCharsets.UTF_8)) {
+      writeZipEntry(
+          zipOutputStream,
+          "[Content_Types].xml",
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+              + "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">"
+              + "<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/>"
+              + "<Default Extension=\"xml\" ContentType=\"application/xml\"/>"
+              + "<Override PartName=\"/xl/workbook.xml\""
+              + " ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/>"
+              + "<Override PartName=\"/xl/worksheets/sheet1.xml\""
+              + " ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/>"
+              + "<Override PartName=\"/xl/styles.xml\""
+              + " ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/>"
+              + "</Types>");
+      writeZipEntry(
+          zipOutputStream,
+          "_rels/.rels",
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+              + "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">"
+              + "<Relationship Id=\"rId1\""
+              + " Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\""
+              + " Target=\"xl/workbook.xml\"/>"
+              + "</Relationships>");
+      writeZipEntry(
+          zipOutputStream,
+          "xl/workbook.xml",
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+              + "<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\""
+              + " xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">"
+              + "<sheets><sheet name=\"" + HtmlUtils.htmlEscape(sheetName) + "\" sheetId=\"1\" r:id=\"rId1\"/></sheets>"
+              + "</workbook>");
+      writeZipEntry(
+          zipOutputStream,
+          "xl/_rels/workbook.xml.rels",
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+              + "<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">"
+              + "<Relationship Id=\"rId1\""
+              + " Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\""
+              + " Target=\"worksheets/sheet1.xml\"/>"
+              + "<Relationship Id=\"rId2\""
+              + " Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\""
+              + " Target=\"styles.xml\"/>"
+              + "</Relationships>");
+      writeZipEntry(
+          zipOutputStream,
+          "xl/styles.xml",
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+              + "<styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
+              + "<fonts count=\"1\"><font><sz val=\"11\"/><name val=\"Calibri\"/></font></fonts>"
+              + "<fills count=\"1\"><fill><patternFill patternType=\"none\"/></fill></fills>"
+              + "<borders count=\"1\"><border><left/><right/><top/><bottom/><diagonal/></border></borders>"
+              + "<cellStyleXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\"/></cellStyleXfs>"
+              + "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>"
+              + "<cellStyles count=\"1\"><cellStyle name=\"Normal\" xfId=\"0\" builtinId=\"0\"/></cellStyles>"
+              + "</styleSheet>");
+      writeZipEntry(
+          zipOutputStream,
+          "xl/worksheets/sheet1.xml",
+          buildGeneratedWorksheetXml(headers, rows));
+      zipOutputStream.finish();
+      return outputStream.toByteArray();
+    } catch (IOException exception) {
+      throw new IllegalStateException("Failed to generate workbook bytes.", exception);
+    }
+  }
+
+  private String buildGeneratedWorksheetXml(List<String> headers, List<List<String>> rows) {
+    StringBuilder rowBuilder = new StringBuilder();
+    rowBuilder.append("<row r=\"1\">");
+    for (int columnIndex = 0; columnIndex < headers.size(); columnIndex++) {
+      rowBuilder.append(generatedInlineStringCell(1, columnIndex, headers.get(columnIndex)));
+    }
+    rowBuilder.append("</row>");
+    for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+      List<String> row = rows.get(rowIndex);
+      int excelRowNumber = rowIndex + 2;
+      rowBuilder.append("<row r=\"").append(excelRowNumber).append("\">");
+      for (int columnIndex = 0; columnIndex < headers.size(); columnIndex++) {
+        String value = columnIndex < row.size() ? row.get(columnIndex) : "";
+        rowBuilder.append(generatedInlineStringCell(excelRowNumber, columnIndex, value));
+      }
+      rowBuilder.append("</row>");
+    }
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+        + "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">"
+        + "<sheetData>"
+        + rowBuilder
+        + "</sheetData></worksheet>";
+  }
+
+  private String generatedInlineStringCell(int rowNumber, int columnIndex, String value) {
+    return "<c r=\""
+        + generatedColumnName(columnIndex)
+        + rowNumber
+        + "\" t=\"inlineStr\"><is><t>"
+        + escapeGeneratedXml(generatedNullToEmpty(value))
+        + "</t></is></c>";
+  }
+
+  private String generatedColumnName(int columnIndex) {
+    StringBuilder builder = new StringBuilder();
+    int current = columnIndex;
+    do {
+      builder.insert(0, (char) ('A' + (current % 26)));
+      current = (current / 26) - 1;
+    } while (current >= 0);
+    return builder.toString();
+  }
+
+  private void writeZipEntry(ZipOutputStream zipOutputStream, String entryName, String content)
+      throws IOException {
+    ZipEntry zipEntry = new ZipEntry(entryName);
+    zipOutputStream.putNextEntry(zipEntry);
+    zipOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
+    zipOutputStream.closeEntry();
+  }
+
+  private String escapeGeneratedXml(String value) {
+    return generatedNullToEmpty(value)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&apos;");
+  }
+
+  private String generatedNullToEmpty(String value) {
+    return value == null ? "" : value;
+  }
+  // jira-dev-pipeline:block:end existing-service-ArticleQueryService
 }

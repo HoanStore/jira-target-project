@@ -213,12 +213,12 @@ public class ArticleQueryService {
     for (ArticleData articleData : exportArticles) {
       rows.add(
           List.of(
-              generatedNullToEmpty(articleData.getSlug()),
-              generatedNullToEmpty(articleData.getTitle()),
-              generatedNullToEmpty(articleData.getDescription()),
+              nullToEmpty(articleData.getSlug()),
+              nullToEmpty(articleData.getTitle()),
+              nullToEmpty(articleData.getDescription()),
               articleData.getProfileData() == null
                   ? ""
-                  : generatedNullToEmpty(articleData.getProfileData().getUsername()),
+                  : nullToEmpty(articleData.getProfileData().getUsername()),
               articleData.getCreatedAt() == null ? "" : articleData.getCreatedAt().toString()));
     }
     return buildGeneratedWorkbook(
@@ -328,7 +328,7 @@ public class ArticleQueryService {
         + generatedColumnName(columnIndex)
         + rowNumber
         + "\" t=\"inlineStr\"><is><t>"
-        + escapeGeneratedXml(generatedNullToEmpty(value))
+        + escapeGeneratedXml(nullToEmpty(value))
         + "</t></is></c>";
   }
 
@@ -351,7 +351,7 @@ public class ArticleQueryService {
   }
 
   private String escapeGeneratedXml(String value) {
-    return generatedNullToEmpty(value)
+    return nullToEmpty(value)
         .replace("&", "&amp;")
         .replace("<", "&lt;")
         .replace(">", "&gt;")
@@ -359,7 +359,7 @@ public class ArticleQueryService {
         .replace("'", "&apos;");
   }
 
-  private String generatedNullToEmpty(String value) {
+  private String nullToEmpty(String value) {
     return value == null ? "" : value;
   }
   // jira-dev-pipeline:block:end existing-service-ArticleQueryService

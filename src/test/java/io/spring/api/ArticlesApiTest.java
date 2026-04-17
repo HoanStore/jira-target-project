@@ -29,6 +29,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.nio.charset.StandardCharsets;
+import static org.hamcrest.Matchers.containsString;
+
 @WebMvcTest({ArticlesApi.class})
 @Import({WebSecurityConfig.class, JacksonCustomizations.class})
 public class ArticlesApiTest extends TestWithCurrentUser {
@@ -170,4 +173,32 @@ public class ArticlesApiTest extends TestWithCurrentUser {
       }
     };
   }
+
+  // jira-dev-pipeline:block:start existing-api-test-ArticlesApiTest
+// @generated-by jira-dev-pipeline
+  // @generated-ticket ArticlesApiTest
+
+  @MockBean private ArticlesApiTestQueryService articlesApiTestQueryService;
+
+  @Test
+  public void shouldDownloadExportArticlesApiTestsExcel() {
+    byte[] workbook = "xlsx".getBytes(StandardCharsets.UTF_8);
+
+    when(articlesApiTestQueryService.exportArticlesApiTestsExcel()).thenReturn(workbook);
+
+    given()
+        .header("Authorization", "Token " + token)
+        .when()
+        .get("/articles/export/excel")
+        .then()
+        .statusCode(200)
+        .header(
+            "Content-Type",
+            containsString(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+        .header("Content-Disposition", containsString("attachment; filename=\""));
+
+    verify(articlesApiTestQueryService).exportArticlesApiTestsExcel();
+  }
+  // jira-dev-pipeline:block:end existing-api-test-ArticlesApiTest
 }

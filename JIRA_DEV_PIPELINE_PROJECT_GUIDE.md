@@ -1,7 +1,11 @@
 # JIRA_DEV_PIPELINE_PROJECT_GUIDE.md
 
-This guide helps automated agents follow the existing conventions in `feature_SCRUM-18`.
-If the repository evolves, update this file so future automated changes stay aligned.
+<!-- jira-dev-pipeline:managed:start -->
+This guide helps automated agents follow the existing conventions in `feature_SCRUM-21`.
+The managed block below is refreshed automatically as the repository evolves.
+Keep the managed keys and structural headings in English so automation can parse them reliably.
+Add team-specific notes after the managed block if you want them preserved across refreshes.
+Those free-form notes may be written in Korean or another team-preferred language.
 
 ## Managed Conventions
 <!-- jira-dev-pipeline:conventions:start -->
@@ -35,3 +39,4 @@ prefer_hash_map_response: true
 - Separate `NEW_RESOURCE` mode from `EXISTING_CLASS_EXTENSION` mode. If `Target Files` point to existing classes, do not scaffold sibling files for a new resource.
 - In `EXISTING_CLASS_EXTENSION` mode, modify only the exact existing target files and keep the generated change inside bounded marker blocks.
 - If `Target Files` do not cover every scaffold file required for `NEW_RESOURCE` mode, skip Level1 generation instead of creating a partial scaffold.
+<!-- jira-dev-pipeline:managed:end -->
